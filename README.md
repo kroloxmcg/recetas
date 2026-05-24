@@ -19,39 +19,40 @@ App de recetas para guardar, consultar y compartir las recetas que vamos encontr
 - **Hosting**: Vercel (gratis)
 - **Coste total**: 0€
 
-## Setup
+No hace falta instalar nada. Todo funciona desde el navegador.
+
+## Deploy
+
+La app se despliega automáticamente con cada push a `main` gracias a la integración de Vercel con GitHub.
+
+## Setup (solo la primera vez)
 
 ### 1. Supabase
 
 1. Crea una cuenta gratis en [supabase.com](https://supabase.com)
 2. Crea un proyecto nuevo
 3. Ve a **SQL Editor** y ejecuta el contenido de `supabase/schema.sql`
-4. Ve a **Settings > API** y copia la URL y la anon key
+4. Ve a **Settings > API Keys** y copia la URL del proyecto y la publishable key
 
-### 2. Variables de entorno
+### 2. Vercel
 
-Copia el archivo de ejemplo y rellénalo con tus datos de Supabase:
+1. Entra en [vercel.com](https://vercel.com) con tu cuenta de GitHub
+2. Importa el repo `recetas`
+3. Añade las variables de entorno:
+   - `VITE_SUPABASE_URL` → la URL de tu proyecto Supabase
+   - `VITE_SUPABASE_ANON_KEY` → la publishable key de Supabase
+4. Dale a Deploy
+
+### 3. Instalar en el móvil
+
+Abre la URL de Vercel en el navegador del móvil y dale a **"Añadir a pantalla de inicio"**.
+
+## Desarrollo local (opcional)
+
+Solo si quieres hacer cambios en el código:
 
 ```bash
-cp .env.example .env
-```
-
-Edita `.env` con tu URL y anon key.
-
-### 3. Desarrollo local
-
-```bash
+cp .env.example .env    # rellena con tus datos de Supabase
 npm install
 npm run dev
 ```
-
-### 4. Deploy a Vercel
-
-1. Sube el repo a GitHub
-2. Conecta el repo en [vercel.com](https://vercel.com)
-3. Añade las variables de entorno (`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`) en Vercel
-4. Deploy automático
-
-### 5. Instalar en el móvil
-
-Abre la URL de Vercel en el navegador del móvil y dale a **"Añadir a pantalla de inicio"**.
