@@ -11,6 +11,7 @@ App de recetas para guardar, consultar y compartir las recetas que vamos encontr
 - Se instala en el móvil como una app (PWA)
 - Sincronización en tiempo real entre usuarios
 - Funciona offline
+- Protegida con PIN de acceso
 
 ## Stack
 
@@ -41,6 +42,7 @@ La app se despliega automáticamente con cada push a `main` gracias a la integra
 3. Añade las variables de entorno:
    - `VITE_SUPABASE_URL` → la URL de tu proyecto Supabase
    - `VITE_SUPABASE_ANON_KEY` → la publishable key de Supabase
+   - `VITE_APP_PIN` → un PIN de 4 dígitos para proteger el acceso
 4. Dale a Deploy
 
 ### 3. Instalar en el móvil
