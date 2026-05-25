@@ -9,6 +9,7 @@ export default function Home() {
   const [recipes, setRecipes] = useState([])
   const [search, setSearch] = useState('')
   const [selectedTag, setSelectedTag] = useState(null)
+  const [sortBy, setSortBy] = useState('recent')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -35,15 +36,22 @@ export default function Home() {
 
   const allTags = [...new Set(recipes.flatMap((r) => r.tags || []))].sort()
 
-  const filtered = recipes.filter((r) => {
-    const q = search.toLowerCase()
-    const matchesSearch =
-      !q ||
-      r.title.toLowerCase().includes(q) ||
-      r.ingredients.toLowerCase().includes(q)
-    const matchesTag = !selectedTag || r.tags?.includes(selectedTag)
-    return matchesSearch && matchesTag
-  })
+  const filtered = recipes
+    .filter((r) => {
+      const q = search.toLowerCase()
+      const matchesSearch =
+        !q ||
+        r.title.toLowerCase().includes(q) ||
+        r.ingredients.toLowerCase().includes(q)
+      const matchesTag = !selectedTag || r.tags?.includes(selectedTag)
+      return matchesSearch && matchesTag
+    })
+    .sort((a, b) => {
+      if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at)
+      if (sortBy === 'alpha') return a.title.localeCompare(b.title, 'es')
+      if (sortBy === 'time') return (a.prep_time || 0) - (b.prep_time || 0)
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
 
   return (
     <div className="page">
@@ -52,6 +60,14 @@ export default function Home() {
       </header>
 
       <SearchBar value={search} onChange={setSearch} />
+      <div className="sort-bar">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
+          <option value="recent">Más recientes</option>
+          <option value="oldest">Más antiguas</option>
+          <option value="alpha">A → Z</option>
+          <option value="time">Menor tiempo</option>
+        </select>
+      </div>
       <TagFilter tags={allTags} selected={selectedTag} onToggle={setSelectedTag} />
 
       {loading ? (
