@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { getTagColor } from '../utils/tagColors'
 
 export default function RecipeDetail() {
   const { id } = useParams()
@@ -50,9 +51,14 @@ export default function RecipeDetail() {
 
       <div className="detail-meta">
         {recipe.prep_time > 0 && <span className="prep-time">{recipe.prep_time} min</span>}
-        {recipe.tags?.map((tag) => (
-          <span key={tag} className="tag-chip">{tag}</span>
-        ))}
+        {recipe.tags?.map((tag) => {
+          const c = getTagColor(tag)
+          return (
+            <span key={tag} className="tag-chip" style={{ background: c.bg, color: c.color }}>
+              {tag}
+            </span>
+          )
+        })}
       </div>
 
       {recipe.ingredients && (
