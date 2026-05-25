@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { getTagColor } from '../utils/tagColors'
 
 const EMPTY = {
   title: '',
@@ -8,7 +9,7 @@ const EMPTY = {
   steps: '',
   link: '',
   prep_time: '',
-  tags: '',
+  tags: [],
 }
 
 export default function RecipeForm() {
@@ -19,6 +20,15 @@ export default function RecipeForm() {
   const [imageFile, setImageFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(isEditing)
+  const [allTags, setAllTags] = useState([])
+  const [newTag, setNewTag] = useState('')
+
+  useEffect(() => {
+    supabase.from('recipes').select('tags').then(({ data }) => {
+      const tags = [...new Set((data || []).flatMap((r) => r.tags || []))].sort()
+      setAllTags(tags)
+    })
+  }, [])
 
   useEffect(() => {
     if (!isEditing) return
@@ -31,13 +41,28 @@ export default function RecipeForm() {
           steps: data.steps,
           link: data.link || '',
           prep_time: data.prep_time || '',
-          tags: (data.tags || []).join(', '),
+          tags: data.tags || [],
         })
       }
       setLoading(false)
     }
     fetch()
   }, [id, isEditing])
+
+  function toggleTag(tag) {
+    setForm((f) => ({
+      ...f,
+      tags: f.tags.includes(tag) ? f.tags.filter((t) => t !== tag) : [...f.tags, tag],
+    }))
+  }
+
+  function addNewTag() {
+    const tag = newTag.trim().toLowerCase()
+    if (!tag) return
+    if (!allTags.includes(tag)) setAllTags((prev) => [...prev, tag].sort())
+    if (!form.tags.includes(tag)) setForm((f) => ({ ...f, tags: [...f.tags, tag] }))
+    setNewTag('')
+  }
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -71,10 +96,7 @@ export default function RecipeForm() {
       steps: form.steps.trim(),
       link: form.link.trim(),
       prep_time: parseInt(form.prep_time, 10) || 0,
-      tags: form.tags
-        .split(',')
-        .map((t) => t.trim().toLowerCase())
-        .filter(Boolean),
+      tags: form.tags,
     }
 
     if (image_url !== undefined) record.image_url = image_url
@@ -163,16 +185,38 @@ export default function RecipeForm() {
           />
         </label>
 
-        <label>
-          Tags (separados por coma)
-          <input
-            type="text"
-            name="tags"
-            value={form.tags}
-            onChange={handleChange}
-            placeholder="pasta, rápida, cena..."
-          />
-        </label>
+        <label>Tags</label>
+        <div className="tag-picker">
+          {allTags.map((tag) => {
+            const c = getTagColor(tag)
+            const selected = form.tags.includes(tag)
+            return (
+              <button
+                key={tag}
+                type="button"
+                className={`tag-chip ${selected ? 'active' : ''}`}
+                style={
+                  selected
+                    ? { background: c.color, color: '#fff' }
+                    : { background: c.bg, color: c.color }
+                }
+                onClick={() => toggleTag(tag)}
+              >
+                {tag}
+              </button>
+            )
+          })}
+          <div className="tag-add">
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addNewTag())}
+              placeholder="Nuevo tag..."
+            />
+            <button type="button" className="btn btn-edit" onClick={addNewTag}>+</button>
+          </div>
+        </div>
 
         <button type="submit" className="btn btn-save" disabled={saving}>
           {saving ? 'Guardando...' : 'Guardar'}

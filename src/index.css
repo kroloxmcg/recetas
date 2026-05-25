@@ -322,6 +322,36 @@ a {
   font-size: 14px;
 }
 
+/* Tag picker (form) */
+.tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag-add {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.tag-add input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid var(--stone-300);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tag-add input:focus {
+  border-color: var(--orange-600);
+}
+
 /* Empty state */
 .empty-state {
   text-align: center;
